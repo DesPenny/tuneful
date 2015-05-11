@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 
 from tuneful import app
 from database import Base, engine
-"""
+
 class Song(Base):
     __tablename__ = "songs"
 
@@ -39,4 +39,3 @@ class File(Base):
             
         }
         return file      
-"""
