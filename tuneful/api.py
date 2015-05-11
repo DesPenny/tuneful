@@ -15,9 +15,9 @@ from utils import upload_path
 song_schema = {
     "properties": {
         "id" : {"type" : "integer"},
-        "song_file": {"type": "string"}
+        "song_file_id": {"type": "string"}
     },
-    "required": ["id", "song_file"]
+    "required": ["id", "song_file_id"]
 }
 
 @app.route("/api/songs", methods=["GET"])
