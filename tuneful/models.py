@@ -15,15 +15,16 @@ class Song(Base):
     
     def as_dictionary(self):
       song_file_details = session.query(File).filter_by(id=self.song_file_id).first()
-        song = {
+      song = {
             "id": self.id,
             "file": {
                       "id": song_file_details.id,
-                      "name": son_file_details.filename
+                      "name": song_file_details.filename
           }
-            
+           
         }
-        return post
+        
+      return song
 
 class File(Base):
     __tablename__ = "files"
