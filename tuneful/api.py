@@ -31,3 +31,21 @@ def songs_get():
     # Convert the posts to JSON and return a response
     data = json.dumps([song.as_dictionary() for song in songs])
     return Response(data, 200, mimetype="application/json")
+  
+@app.route("/api/songs/<int:id>", methods=["GET"])
+@decorators.accept("application/json")
+def single_song_get(id):
+    """ Get a single song """
+    
+    song = session.query(models.Song).get(id)
+    
+    # Check whether the post exists
+    # If not return a 404 with a helpful message
+    if not song:
+        message = "Could not find song with id {}".format(id)
+        data = json.dumps({"message": message})
+        return Response(data, 404, mimetype="application/json")
+
+    # Return the post as JSON
+    data = json.dumps(song.as_dictionary())
+    return Response(data, 200, mimetype="application/json")
