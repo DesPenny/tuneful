@@ -11,6 +11,15 @@ from tuneful import app
 from database import session
 from utils import upload_path
 
+# JSON Schema describing the structure of a song
+song_schema = {
+    "properties": {
+        "id" : {"type" : "integer"},
+        "song_file": {"type": "string"}
+    },
+    "required": ["id", "song_file"]
+}
+
 @app.route("/api/songs", methods=["GET"])
 @decorators.accept("application/json")
 def songs_get():
