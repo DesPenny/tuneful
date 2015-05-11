@@ -49,3 +49,24 @@ def single_song_get(id):
     # Return the post as JSON
     data = json.dumps(song.as_dictionary())
     return Response(data, 200, mimetype="application/json")
+  
+@app.route("/api/songs", methods=["POST"])
+@decorators.accept("application/json")
+@decorators.require("application/json")
+def song_post():
+    """ Add a new song """
+    data = request.json
+    
+    
+    # Add the song to the database
+    song = models.Song(song_file_id=data["file"]["id"])
+    session.add(song)
+    session.commit()
+
+    # Return a 201 Created, containing the post as JSON and with the
+    # Location header set to the location of the post
+    data = json.dumps(song.as_dictionary())
+    headers = {"Location": url_for("songs_get", id=song.id)}
+    return Response(data, 201, headers=headers,
+                    mimetype="application/json")
+  
