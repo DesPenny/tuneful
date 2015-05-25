@@ -135,7 +135,99 @@ class TestAPI(unittest.TestCase):
         song = songs[0]
         self.assertEqual(song.id, fileA.id)
         
+    def test_delete_single_song(self):
+        """ Deleting a single song from the database """
+        fileA = models.File(filename="FileA.mp3")
+        session.add(fileA)
+        session.commit()
+
+        songA = models.Song(song_file_id=fileA.id)
+        session.add(songA)
+        session.commit()
+
+        response = self.client.delete("/api/songs/{}".format(songA.id),
+            headers=[("Accept", "application/json")])
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "application/json")
+
+        songs = session.query(models.Song).all()
+        self.assertEqual(len(songs), 0)
     
-    
+    def test_get_uploaded_file(self):
+        path =  upload_path("test.txt")
+        with open(path, "w") as f:
+            f.write("File contents")
+
+        response = self.client.get("/uploads/test.txt")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "text/plain")
+        self.assertEqual(response.data, "File contents")
+        
+    def test_file_upload(self):
+        data = {
+            "file": (StringIO("File contents"), "test.txt")
+        }
+
+        response = self.client.post("/api/files",
+            data=data,
+            content_type="multipart/form-data",
+            headers=[("Accept", "application/json")]
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.mimetype, "application/json")
+
+        data = json.loads(response.data)
+        self.assertEqual(urlparse(data["path"]).path, "/uploads/test.txt")
+
+        path = upload_path("test.txt")
+        self.assertTrue(os.path.isfile(path))
+        with open(path) as f:
+            contents = f.read()
+        self.assertEqual(contents, "File contents")
+        
+    def test_update_single_song(self):
+        """ Testing update a song """
+        # First, create a new post
+        fileB = models.File(filename="FileB.mp3")
+        data_inject = {
+            "file": {
+                  "id": fileB.id
+                    }
+        }
+        
+        fileA = models.File(filename="FileA.mp3")
+        
+
+        session.add_all([fileA])
+        session.commit()
+        
+        songA = models.Song(song_file_id= fileA.id)
+        songB = models.Song(song_file_id= fileB.id)
+        session.add_all([songA])
+        session.commit()
+  
+        #Now edit the post with new data
+        response = self.client.put("/api/songs/{}".format(songA.id),
+                                      data=json.dumps(data_inject),
+                                      content_type="application/json",
+                                      headers=[("Accept", "application/json")])
+        
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.mimetype, "application/json")
+
+        data=json.loads(response.data)
+        
+        # Test that it contains the new data
+        
+        self.assertEqual(data["id"], fileB.id)
+        
+        songs = session.query(models.Song).all()
+        self.assertEqual(len(songs), 1)
+
+        song = songs[0]
+        self.assertEqual(song.id, fileB.id)
 if __name__ == "__main__":
     unittest.main()
