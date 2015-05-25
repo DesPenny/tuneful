@@ -18,8 +18,8 @@ class Song(Base):
       song = {
             "id": self.id,
             "file": {
-                      "id": song_file_details.id,
-                      "name": song_file_details.filename
+                      "id": song_file_details.as_dictionary(),
+                      
           }
            
         }
@@ -37,6 +37,7 @@ class File(Base):
         file = {
             "id": self.id,
             "name": self.filename,
+            "path": url_for("uploaded_file", filename=self.filename)
             
         }
         return file      
