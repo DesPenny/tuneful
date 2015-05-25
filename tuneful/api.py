@@ -133,9 +133,3 @@ def file_post():
     data = db_file.as_dictionary()
     return Response(json.dumps(data), 201, mimetype="application/json")
   
-def as_dictionary(self):
-    return {
-        "id": self.id,
-        "name": self.filename,
-        "path": url_for("uploaded_file", filename=self.filename)
-    }

@@ -17,11 +17,7 @@ class Song(Base):
       song_file_details = session.query(File).filter_by(id=self.song_file_id).first()
       song = {
             "id": self.id,
-            "file": {
-                      "id": song_file_details.as_dictionary(),
-                      
-          }
-           
+            "file": song_file_details.as_dictionary(),
         }
         
       return song
